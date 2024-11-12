@@ -29,6 +29,7 @@ namespace LinkedListsConsole
             Console.WriteLine("5. Генерация команд для очереди");
             Console.WriteLine("6. Калькулятор (Постфиксная запись)");
             Console.WriteLine("7. Перевод из постфиксной записи в инфиксную");
+            Console.WriteLine("8. Применение структур данных");
 
             string choice = Console.ReadLine();
             switch (choice)
@@ -53,6 +54,9 @@ namespace LinkedListsConsole
                     break;
                 case "7":
                     ConvertPostfixToInfix();
+                    break;
+                case "8":
+                    RunStructureExamples();
                     break;
                 default:
                     Console.WriteLine("Некорректный выбор. Попробуйте снова.");
@@ -512,7 +516,273 @@ namespace LinkedListsConsole
             }
             additionalList.PrintList();
             Run();
+        }
+        private void RunStructureExamples()
+        {
+            Console.Clear();
+            Console.WriteLine("Выберите пример:");
+            Console.WriteLine("1. Стек(Проверка правильности скобок в HTML)");
+            Console.WriteLine("2. Список(Список работников)");
+            Console.WriteLine("3. Очередь(Очередь в колл-центре)");
+            Console.WriteLine("4. Дерево(Дерево комментариев в блоге)");
+            string choice = Console.ReadLine();
+            switch (choice)
+            {
+                case "1":
+                    IsValidHTML();
+                    break;
+                case "2":
+                    List<string> employees = new List<string>();
+                    EmployeeList(employees);
+                    break;
+                case "3":
+                    Queue<string> callQueue = new Queue<string>();
+                    CallCenterQueue(callQueue);
+                    break;
+                case "4":
+                    CommentTree tree = new CommentTree();
+                    BlogTree(tree);
+                    break;
+                default:
+                    Console.WriteLine("Некорректный выбор.");
+                    break;
+            }
+        }
+        private void IsValidHTML()
+        {
+            Console.WriteLine("Введите HTML-строку");
+            string html = Console.ReadLine();
+            Stack<string> stack = new Stack<string>();
+            int i = 0;
+            while (i < html.Length)
+            {
+                if (html[i] == '<')
+                {
 
+                    int start = i;
+                    i++;
+
+
+                    while (i < html.Length && html[i] != '>')
+                    {
+                        i++;
+                    }
+
+                    if (i == html.Length)
+                    {
+
+                        Console.WriteLine("Ошибка обнаружена");
+                    }
+
+                    string tag = html.Substring(start, i - start + 1);
+
+                    if (tag.StartsWith("</"))
+                    {
+
+                        if (stack.Count == 0)
+                        {
+
+                            Console.WriteLine("Ошибка обнаружена");
+                        }
+
+                        string openingTag = stack.Pop();
+                        string expectedClosingTag = "</" + openingTag.Substring(1);
+
+                        if (tag != expectedClosingTag)
+                        {
+                            Console.WriteLine("Ошибка обнаружена");
+                        }
+                    }
+                    else
+                    {
+                        stack.Push(tag);
+                    }
+                }
+
+                i++;
+            }
+            if (stack.Count == 0)
+            {
+                Console.WriteLine("Ошибка не обнаружена");
+            }
+            else
+            {
+                Console.WriteLine("Ошибка обнаружена");
+            }
+            Run();
+        }
+        private void EmployeeList(List<string> employees)
+        {
+            Console.Clear();
+            Console.WriteLine("Выберите команду");
+            Console.WriteLine("1. Добавить сотрудника в список ");
+            Console.WriteLine("2. Удалить сотрудника из списка");
+            Console.WriteLine("3. Вывести список сотрудников");
+            Console.WriteLine("4. Выход");
+
+            string choice = Console.ReadLine();
+            switch (choice)
+            {
+                case "1":
+                    AddEmployee(employees);
+                    EmployeeList(employees);
+                    break;
+                case "2":
+                    RemoveEmployee(employees);
+                    EmployeeList(employees);
+                    break;
+                case "3":
+                    ShowEmployee(employees);
+                    EmployeeList(employees);
+                    break;
+                case "4":
+                    Run();
+                    break;
+                default:
+                    Console.WriteLine("Некорректный выбор.");
+                    break;
+            }
+        }
+        private List<string> AddEmployee(List<string> list)
+        {
+            Console.WriteLine("Введите имя");
+            string name = Console.ReadLine();
+            list.Add(name);
+            return list;
+        }
+        private List<string> RemoveEmployee(List<string> list)
+        {
+            Console.WriteLine("Введите имя");
+            string name = Console.ReadLine();
+            if (list.Contains(name))
+            {
+                list.Remove(name);
+            }
+            else
+            {
+                Console.WriteLine($"Сотрудник с именем {name} не найден.");
+            }
+            return list;
+        }
+        private void ShowEmployee(List<string> list)
+        {
+            if (list.Count == 0)
+            {
+                Console.WriteLine("Список работников пуст.");
+            }
+            else
+            {
+                Console.WriteLine("Список работников:");
+                foreach (var employee in list)
+                {
+                    Console.WriteLine(employee);
+                }
+            }
+        }
+        private void CallCenterQueue(Queue<string> callQueue)
+        {
+            Console.Clear();
+            Console.WriteLine("Выберите команду");
+            Console.WriteLine("1. Добавить номер в очередь на звонок ");
+            Console.WriteLine("2. Совершить звонок");
+            Console.WriteLine("3. Вывести очередь");
+            Console.WriteLine("4. Выход");
+            string choice = Console.ReadLine();
+            switch (choice)
+            {
+                case "1":
+                    AddCall(callQueue);
+                    CallCenterQueue(callQueue);
+                    break;
+                case "2":
+                    ProcessCall(callQueue);
+                    CallCenterQueue(callQueue);
+                    break;
+                case "3":
+                    DisplayQueue(callQueue);
+                    CallCenterQueue(callQueue);
+                    break;
+                case "4":
+                    Run();
+                    break;
+                default:
+                    Console.WriteLine("Некорректный выбор.");
+                    break;
+            }
+        }
+        public Queue<string> AddCall(Queue<string> callQueue)
+        {
+            Console.WriteLine("Введите номер");
+            string caller = Console.ReadLine();
+            callQueue.Enqueue(caller);
+            Console.WriteLine($"Звонок от {caller} добавлен в очередь.");
+            return callQueue;
+        }
+
+        public Queue<string> ProcessCall(Queue<string> callQueue)
+        {
+            if (callQueue.Count > 0)
+            {
+                string caller = callQueue.Dequeue();
+                Console.WriteLine($"Звонок от {caller} обработан.");
+            }
+            else
+            {
+                Console.WriteLine("Очередь звонков пуста.");
+            }
+            return callQueue;
+        }
+
+        public void DisplayQueue(Queue<string> callQueue)
+        {
+            if (callQueue.Count == 0)
+            {
+                Console.WriteLine("Очередь звонков пуста.");
+            }
+            else
+            {
+                Console.WriteLine("Текущая очередь звонков:");
+                foreach (var caller in callQueue)
+                {
+                    Console.WriteLine(caller);
+                }
+            }
+        }
+        private void BlogTree(CommentTree tree)
+        {
+            Console.WriteLine("Выберите команду");
+            Console.WriteLine("1. Добавить комментарий ");
+            Console.WriteLine("2. Удалить комментарий");
+            Console.WriteLine("3. Вывести дерево комментария");
+            Console.WriteLine("4. Выход");
+            string choice = Console.ReadLine();
+            switch (choice)
+            {
+                case "1":
+                    Console.WriteLine("Введите текст комментария:");
+                    string text = Console.ReadLine();
+                    Console.WriteLine("Введите текст родительского комментария (или оставьте пустым для корневого комментария):");
+                    string parentText = Console.ReadLine();
+                    tree.AddComment(text, string.IsNullOrWhiteSpace(parentText) ? null : parentText);
+                    BlogTree(tree);
+                    break;
+                case "2":
+                    Console.WriteLine("Введите текст комментария для удаления:");
+                    string removeText = Console.ReadLine();
+                    tree.RemoveComment(removeText);
+                    BlogTree(tree);
+                    break;
+                case "3":
+                    tree.DisplayComments();
+                    BlogTree(tree);
+                    break;
+                case "4":
+                    Run();
+                    break;
+                default:
+                    Console.WriteLine("Некорректный выбор.");
+                    break;
+            }
         }
     }
 }
