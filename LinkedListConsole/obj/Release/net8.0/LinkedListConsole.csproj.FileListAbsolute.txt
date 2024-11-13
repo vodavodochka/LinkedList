@@ -50,3 +50,4 @@ D:\Algorithms\LinkedListConsole\LinkedListConsole\obj\Release\net8.0\refint\Link
 D:\Algorithms\LinkedListConsole\LinkedListConsole\obj\Release\net8.0\LinkedListConsole.pdb
 D:\Algorithms\LinkedListConsole\LinkedListConsole\obj\Release\net8.0\LinkedListConsole.genruntimeconfig.cache
 D:\Algorithms\LinkedListConsole\LinkedListConsole\obj\Release\net8.0\ref\LinkedListConsole.dll
+D:\Algorithms\LinkedListConsole\LinkedListConsole\obj\Release\net8.0\LinkedListConsole.sourcelink.json

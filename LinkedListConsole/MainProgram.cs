@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text;
 using System.Windows.Forms;
 
 namespace LinkedListsConsole
 {
     public class MainProgram
     {
+        private int count_commands;
         private Stack stack = new Stack();
         private Queue queue = new Queue();
         private CustomLinkedList<int> additionalList = new CustomLinkedList<int>();
         Stopwatch stopwatch = new Stopwatch();
+        private BinaryTree<object> binaryTree;
 
         [STAThread]
         public static void Main(string[] args)
@@ -28,8 +31,10 @@ namespace LinkedListsConsole
             Console.WriteLine("4. Генерация команд для стека");
             Console.WriteLine("5. Генерация команд для очереди");
             Console.WriteLine("6. Калькулятор (Постфиксная запись)");
-            Console.WriteLine("7. Перевод из постфиксной записи в инфиксную");
+            Console.WriteLine("7. Перевод из инфиксной формы в постфиксную");
             Console.WriteLine("8. Применение структур данных");
+            Console.WriteLine("9. Binary Tree");
+
 
             string choice = Console.ReadLine();
             switch (choice)
@@ -58,10 +63,65 @@ namespace LinkedListsConsole
                 case "8":
                     RunStructureExamples();
                     break;
+                case "9":
+                    ProcessBinaryTree();
+                    break;
                 default:
                     Console.WriteLine("Некорректный выбор. Попробуйте снова.");
                     Run();
                     break;
+            }
+        }
+
+        private void ProcessBinaryTree()
+        {
+            if (binaryTree == null)
+            {
+                Console.WriteLine("Введите корневой элемент дерева:");
+                object rootData = Console.ReadLine();
+                binaryTree = new BinaryTree<object>(rootData);
+            }
+
+            bool exitTreeMenu = false;
+            while (!exitTreeMenu)
+            {
+                Console.Clear();
+                Console.WriteLine("Binary Tree Operations:");
+                Console.WriteLine("1. Добавить узел");
+                Console.WriteLine("2. Прямой обход (Pre-order)");
+                Console.WriteLine("3. Симметричный обход (In-order)");
+                Console.WriteLine("4. Обратный обход (Post-order)");
+                Console.WriteLine("0. Назад в главное меню");
+
+                string choice = Console.ReadLine();
+                switch (choice)
+                {
+                    case "1":
+                        AddNodeToTree();
+                        break;
+                    case "2":
+                        Console.WriteLine("Прямой обход:");
+                        BinaryTree<object>.PreOrderTraversal(binaryTree.Root);
+                        Console.WriteLine();
+                        break;
+                    case "3":
+                        Console.WriteLine("Симметричный обход:");
+                        BinaryTree<object>.InOrderTraversal(binaryTree.Root);
+                        Console.WriteLine();
+                        break;
+                    case "4":
+                        Console.WriteLine("Обратный обход:");
+                        BinaryTree<object>.PostOrderTraversal(binaryTree.Root);
+                        Console.WriteLine();
+                        break;
+                    case "0":
+                        exitTreeMenu = true;
+                        break;
+                    default:
+                        Console.WriteLine("Некорректный выбор.");
+                        break;
+                }
+                Run();
             }
         }
 
@@ -74,12 +134,15 @@ namespace LinkedListsConsole
             {
                 string[] commands = File.ReadAllLines(filePath);
                 stopwatch.Restart();
+                count_commands = 0;
                 foreach (var command in commands)
                 {
+                    count_commands++;
                     ProcessCommand(command);
                 }
                 stopwatch.Stop();
                 Console.WriteLine("Времени затрачено: " + stopwatch.Elapsed);
+                Console.WriteLine("Операций выполнено: " + count_commands);
             }
             else
             {
@@ -97,12 +160,15 @@ namespace LinkedListsConsole
             {
                 string[] commands = File.ReadAllLines(filePath);
                 stopwatch.Restart();
+                count_commands = 0;
                 foreach (var command in commands)
                 {
+                    count_commands++;
                     ProcessCommand(command);
                 }
                 stopwatch.Stop();
                 Console.WriteLine("Времени затрачено: " + stopwatch.Elapsed);
+                Console.WriteLine("Операций выполнено: " + count_commands);
             }
             else
             {
@@ -178,15 +244,51 @@ namespace LinkedListsConsole
                         Console.WriteLine("Содержимое очереди: " + queue.Print());
                     }
                     break;
-
                 default:
                     Console.WriteLine("Неизвестная команда.");
                     break;
             }
         }
 
-        // Очередь
-        
+        private BinaryTree<object>.Node FindNode(BinaryTree<object>.Node node, object data)
+        {
+            if (node == null) return null;
+            if (node.Data.Equals(data)) return node;
+            var left = FindNode(node.Left, data);
+            return left ?? FindNode(node.Right, data);
+        }
+
+        private void AddNodeToTree()
+        {
+            Console.WriteLine("Введите родительский узел для нового элемента:");
+            object parentData = Console.ReadLine();
+
+            var parentNode = FindNode(binaryTree.Root, parentData);
+            if (parentNode == null)
+            {
+                Console.WriteLine("Узел не найден.");
+                return;
+            }
+
+            Console.WriteLine("Введите значение нового узла:");
+            object data = Console.ReadLine();
+            Console.WriteLine("Добавить узел влево (L) или вправо (R)?");
+            string direction = Console.ReadLine().ToUpper();
+
+            if (direction == "L")
+            {
+                binaryTree.AddLeft(parentNode, data);
+            }
+            else if (direction == "R")
+            {
+                binaryTree.AddRight(parentNode, data);
+            }
+            else
+            {
+                Console.WriteLine("Некорректный ввод.");
+            }
+        }
+
 
         // Открытие диалогового окна для выбора файла
         private string OpenFileDialog()
@@ -232,7 +334,8 @@ namespace LinkedListsConsole
         private string[] GenerateCommands()
         {
             Random rand = new Random();
-            string[] commands = new string[100000]; // Генерация 100 команд
+            int count = rand.Next(10000, 100000);
+            string[] commands = new string[100000];
             for (int i = 0; i < 100000; i++)
             {
                 int commandType = rand.Next(1, 7); // Команды от 1 до 6
@@ -270,7 +373,15 @@ namespace LinkedListsConsole
             Console.Clear();
             Console.WriteLine("Введите выражение в постфиксной записи:");
 
-            string expression = Console.ReadLine().Trim();
+            string filePath = OpenFileDialog();
+            string[] commands = File.ReadAllLines(filePath);
+            StringBuilder sb = new StringBuilder();
+            foreach (string command in commands)
+            {
+                sb.Append(command);
+            }
+
+            string expression = sb.ToString();
 
             // Проверка на пустую строку
             if (string.IsNullOrEmpty(expression))
@@ -397,11 +508,11 @@ namespace LinkedListsConsole
         {
             Console.Clear();
             Console.Write("Введите постфиксное выражение: ");
-            string postfixExpression = Console.ReadLine();
+            string infixExpression = Console.ReadLine();
             try
             {
-                string infixExpression = PostfixToInfixConverter.ConvertToInfix(postfixExpression);
-                Console.WriteLine("Инфиксное выражение: " + infixExpression);
+                string postfixExpression = InfixToPostfixConverter.ConvertToPostfix(infixExpression);
+                Console.WriteLine("Постфиксное выражение: " + postfixExpression);
             }
             catch (ArgumentException ex)
             {
@@ -521,7 +632,7 @@ namespace LinkedListsConsole
         {
             Console.Clear();
             Console.WriteLine("Выберите пример:");
-            Console.WriteLine("1. Стек(Проверка правильности скобок в HTML)");
+            Console.WriteLine("1. Стек(Проверка правильности скобок в строке)");
             Console.WriteLine("2. Список(Список работников)");
             Console.WriteLine("3. Очередь(Очередь в колл-центре)");
             Console.WriteLine("4. Дерево(Дерево комментариев в блоге)");
@@ -529,14 +640,22 @@ namespace LinkedListsConsole
             switch (choice)
             {
                 case "1":
-                    IsValidHTML();
+                    Console.WriteLine("Введите строку со скобками: ");
+                    if (Validate(Console.ReadLine()))
+                    {
+                        Console.WriteLine("Ошибок нет");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Ошибки есть");
+                    }
                     break;
                 case "2":
                     List<string> employees = new List<string>();
                     EmployeeList(employees);
                     break;
                 case "3":
-                    Queue<string> callQueue = new Queue<string>();
+                    Queue callQueue = new Queue();
                     CallCenterQueue(callQueue);
                     break;
                 case "4":
@@ -547,70 +666,37 @@ namespace LinkedListsConsole
                     Console.WriteLine("Некорректный выбор.");
                     break;
             }
-        }
-        private void IsValidHTML()
-        {
-            Console.WriteLine("Введите HTML-строку");
-            string html = Console.ReadLine();
-            Stack<string> stack = new Stack<string>();
-            int i = 0;
-            while (i < html.Length)
-            {
-                if (html[i] == '<')
-                {
-
-                    int start = i;
-                    i++;
-
-
-                    while (i < html.Length && html[i] != '>')
-                    {
-                        i++;
-                    }
-
-                    if (i == html.Length)
-                    {
-
-                        Console.WriteLine("Ошибка обнаружена");
-                    }
-
-                    string tag = html.Substring(start, i - start + 1);
-
-                    if (tag.StartsWith("</"))
-                    {
-
-                        if (stack.Count == 0)
-                        {
-
-                            Console.WriteLine("Ошибка обнаружена");
-                        }
-
-                        string openingTag = stack.Pop();
-                        string expectedClosingTag = "</" + openingTag.Substring(1);
-
-                        if (tag != expectedClosingTag)
-                        {
-                            Console.WriteLine("Ошибка обнаружена");
-                        }
-                    }
-                    else
-                    {
-                        stack.Push(tag);
-                    }
-                }
-
-                i++;
-            }
-            if (stack.Count == 0)
-            {
-                Console.WriteLine("Ошибка не обнаружена");
-            }
-            else
-            {
-                Console.WriteLine("Ошибка обнаружена");
-            }
             Run();
         }
+        public bool Validate(string expression)
+        {
+            Stack stack = new Stack();
+
+            foreach (char c in expression)
+            {
+                if (c == '(' || c == '{' || c == '[')
+                {
+                    stack.Push(c);
+                }
+                else if (c == ')' || c == '}' || c == ']')
+                {
+                    if (stack.Size() == 0) return false;
+
+                    char top = (char)stack.Pop();
+                    if (!IsMatchingPair(top, c)) return false;
+                }
+            }
+
+            return stack.Size() == 0;
+        }
+
+        private bool IsMatchingPair(char open, char close)
+        {
+            return (open == '(' && close == ')') ||
+                    (open == '{' && close == '}') ||
+                    (open == '[' && close == ']');
+        }
+
         private void EmployeeList(List<string> employees)
         {
             Console.Clear();
@@ -679,9 +765,8 @@ namespace LinkedListsConsole
                 }
             }
         }
-        private void CallCenterQueue(Queue<string> callQueue)
+        private void CallCenterQueue(Queue callQueue)
         {
-            Console.Clear();
             Console.WriteLine("Выберите команду");
             Console.WriteLine("1. Добавить номер в очередь на звонок ");
             Console.WriteLine("2. Совершить звонок");
@@ -710,7 +795,7 @@ namespace LinkedListsConsole
                     break;
             }
         }
-        public Queue<string> AddCall(Queue<string> callQueue)
+        public Queue AddCall(Queue callQueue)
         {
             Console.WriteLine("Введите номер");
             string caller = Console.ReadLine();
@@ -719,11 +804,11 @@ namespace LinkedListsConsole
             return callQueue;
         }
 
-        public Queue<string> ProcessCall(Queue<string> callQueue)
+        public Queue ProcessCall(Queue callQueue)
         {
-            if (callQueue.Count > 0)
+            if (callQueue.Size() > 0)
             {
-                string caller = callQueue.Dequeue();
+                string caller = callQueue.Dequeue().ToString();
                 Console.WriteLine($"Звонок от {caller} обработан.");
             }
             else
@@ -733,19 +818,16 @@ namespace LinkedListsConsole
             return callQueue;
         }
 
-        public void DisplayQueue(Queue<string> callQueue)
+        public void DisplayQueue(Queue callQueue)
         {
-            if (callQueue.Count == 0)
+            if (callQueue.Size() == 0)
             {
                 Console.WriteLine("Очередь звонков пуста.");
             }
             else
             {
                 Console.WriteLine("Текущая очередь звонков:");
-                foreach (var caller in callQueue)
-                {
-                    Console.WriteLine(caller);
-                }
+                Console.WriteLine(callQueue.Print());
             }
         }
         private void BlogTree(CommentTree tree)

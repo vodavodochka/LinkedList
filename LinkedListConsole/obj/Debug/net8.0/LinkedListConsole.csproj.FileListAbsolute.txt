@@ -50,3 +50,4 @@ D:\Algorithms\LinkedListConsole\LinkedListConsole\bin\Debug\net8.0\zh-Hans\Syste
 D:\Algorithms\LinkedListConsole\LinkedListConsole\bin\Debug\net8.0\zh-Hant\System.Windows.Forms.Primitives.resources.dll
 D:\Algorithms\LinkedListConsole\LinkedListConsole\obj\Debug\net8.0\LinkedListConsole.csproj.AssemblyReference.cache
 D:\Algorithms\LinkedListConsole\LinkedListConsole\obj\Debug\net8.0\LinkedLi.6E2D8BCF.Up2Date
+D:\Algorithms\LinkedListConsole\LinkedListConsole\obj\Debug\net8.0\LinkedListConsole.sourcelink.json

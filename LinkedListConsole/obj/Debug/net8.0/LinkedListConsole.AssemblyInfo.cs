@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LinkedListConsole")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ee0a6b0571b15aabe91b6598784d4950c5ffc07c")]
 [assembly: System.Reflection.AssemblyProductAttribute("LinkedListConsole")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LinkedListConsole")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
